@@ -82,6 +82,20 @@ namespace Calculator.Tests
             Assert.IsTrue(NavCategory.IsConverterViewMode(ViewMode.Data));
             Assert.IsTrue(NavCategory.IsConverterViewMode(ViewMode.Pressure));
             Assert.IsTrue(NavCategory.IsConverterViewMode(ViewMode.Angle));
+            Assert.IsTrue(NavCategory.IsConverterViewMode(ViewMode.Torque));
+
+            // The multi-field calculators are listed in the Calculator menu group, but use their own page
+            // (not the standard calculator, the date calculator or the unit converter).
+            foreach (var mode in new[] { ViewMode.ElectricPower, ViewMode.OhmsLaw, ViewMode.MechanicalPower })
+            {
+                Assert.IsFalse(NavCategory.IsConverterViewMode(mode));
+                Assert.IsFalse(NavCategory.IsCalculatorViewMode(mode));
+                Assert.IsFalse(NavCategory.IsDateCalculatorViewMode(mode));
+                Assert.IsTrue(NavCategory.IsEngineeringViewMode(mode));
+                Assert.AreEqual(CategoryGroupType.Calculator, NavCategoryStates.GetGroupType(mode));
+            }
+            Assert.IsFalse(NavCategory.IsEngineeringViewMode(ViewMode.Torque));
+            Assert.IsFalse(NavCategory.IsEngineeringViewMode(ViewMode.Date));
         }
     }
 
@@ -104,13 +118,16 @@ namespace Calculator.Tests
             ValidateNavCategory(calculatorCategories, 2, ViewMode.Graphing);
             ValidateNavCategory(calculatorCategories, 3, ViewMode.Programmer);
             ValidateNavCategory(calculatorCategories, 4, ViewMode.Date);
-            Assert.AreEqual(5, calculatorCategories.Count);
+            ValidateNavCategory(calculatorCategories, 5, ViewMode.ElectricPower);
+            ValidateNavCategory(calculatorCategories, 6, ViewMode.OhmsLaw);
+            ValidateNavCategory(calculatorCategories, 7, ViewMode.MechanicalPower);
+            Assert.AreEqual(8, calculatorCategories.Count);
 
             var converterGroup = (NavCategoryGroup)menuOptions[1];
             Assert.AreEqual(CategoryGroupType.Converter, converterGroup.GroupType);
 
             var converterCategories = converterGroup.Categories;
-            Assert.AreEqual(13, converterCategories.Count);
+            Assert.AreEqual(14, converterCategories.Count);
             ValidateNavCategory(converterCategories, 0, ViewMode.Currency);
             ValidateNavCategory(converterCategories, 1, ViewMode.Volume);
             ValidateNavCategory(converterCategories, 2, ViewMode.Length);
@@ -124,6 +141,7 @@ namespace Calculator.Tests
             ValidateNavCategory(converterCategories, 10, ViewMode.Data);
             ValidateNavCategory(converterCategories, 11, ViewMode.Pressure);
             ValidateNavCategory(converterCategories, 12, ViewMode.Angle);
+            ValidateNavCategory(converterCategories, 13, ViewMode.Torque);
         }
 
         private void ValidateNavCategory(IList<NavCategory> categories, int index, ViewMode expectedMode)
@@ -142,9 +160,12 @@ namespace Calculator.Tests
     {
         private static readonly ViewMode[] OrderedModes =
         {
-            ViewMode.Standard, ViewMode.Scientific, ViewMode.Graphing, ViewMode.Programmer, ViewMode.Date, ViewMode.Currency,
+            ViewMode.Standard, ViewMode.Scientific, ViewMode.Graphing, ViewMode.Programmer, ViewMode.Date,
+            ViewMode.ElectricPower, ViewMode.OhmsLaw, ViewMode.MechanicalPower,
+            ViewMode.Currency,
             ViewMode.Volume, ViewMode.Length, ViewMode.Weight, ViewMode.Temperature, ViewMode.Energy, ViewMode.Area,
-            ViewMode.Speed, ViewMode.Time, ViewMode.Power, ViewMode.Data, ViewMode.Pressure, ViewMode.Angle
+            ViewMode.Speed, ViewMode.Time, ViewMode.Power, ViewMode.Data, ViewMode.Pressure, ViewMode.Angle,
+            ViewMode.Torque
         };
 
         [TestMethod]
@@ -203,7 +224,8 @@ namespace Calculator.Tests
 
             // Boundary testing
             Assert.AreEqual(ViewMode.None, NavCategoryStates.Deserialize(-1));
-            Assert.AreEqual(ViewMode.None, NavCategoryStates.Deserialize(18));
+            Assert.AreEqual(ViewMode.OhmsLaw, NavCategoryStates.Deserialize(21));
+            Assert.AreEqual(ViewMode.None, NavCategoryStates.Deserialize(22));
         }
 
         [TestMethod]
@@ -233,8 +255,8 @@ namespace Calculator.Tests
         public void IsValidViewMode_AllInvalid()
         {
             Assert.IsFalse(NavCategoryStates.IsValidViewMode(ViewMode.None));
-            Assert.IsTrue(NavCategoryStates.IsValidViewMode((ViewMode)17));
-            Assert.IsFalse(NavCategoryStates.IsValidViewMode((ViewMode)18));
+            Assert.IsTrue(NavCategoryStates.IsValidViewMode((ViewMode)21));
+            Assert.IsFalse(NavCategoryStates.IsValidViewMode((ViewMode)22));
 
             // Also verify the lower bound
             Assert.IsTrue(NavCategoryStates.IsValidViewMode((ViewMode)0));
@@ -345,9 +367,25 @@ namespace Calculator.Tests
             Assert.AreEqual(10, NavCategoryStates.GetIndexInGroup(ViewMode.Data, CategoryGroupType.Converter));
             Assert.AreEqual(11, NavCategoryStates.GetIndexInGroup(ViewMode.Pressure, CategoryGroupType.Converter));
             Assert.AreEqual(12, NavCategoryStates.GetIndexInGroup(ViewMode.Angle, CategoryGroupType.Converter));
+            Assert.AreEqual(13, NavCategoryStates.GetIndexInGroup(ViewMode.Torque, CategoryGroupType.Converter));
+            Assert.AreEqual(5, NavCategoryStates.GetIndexInGroup(ViewMode.ElectricPower, CategoryGroupType.Calculator));
+            Assert.AreEqual(6, NavCategoryStates.GetIndexInGroup(ViewMode.OhmsLaw, CategoryGroupType.Calculator));
+            Assert.AreEqual(7, NavCategoryStates.GetIndexInGroup(ViewMode.MechanicalPower, CategoryGroupType.Calculator));
 
             Assert.AreEqual(-1, NavCategoryStates.GetIndexInGroup(ViewMode.None, CategoryGroupType.Calculator));
             Assert.AreEqual(-1, NavCategoryStates.GetIndexInGroup(ViewMode.None, CategoryGroupType.Converter));
+        }
+
+        [TestMethod]
+        public void GetFlatIndex_MatchesMenuWithSectionHeaders()
+        {
+            // Flat menu: [Calculator header] Standard, Scientific, Graphing, Programmer, Date,
+            // Electric power, Ohm's law, Mechanical power, [Converter header] Currency, ...
+            Assert.AreEqual(1, NavCategoryStates.GetFlatIndex(ViewMode.Standard));
+            Assert.AreEqual(5, NavCategoryStates.GetFlatIndex(ViewMode.Date));
+            Assert.AreEqual(6, NavCategoryStates.GetFlatIndex(ViewMode.ElectricPower));
+            Assert.AreEqual(8, NavCategoryStates.GetFlatIndex(ViewMode.MechanicalPower));
+            Assert.AreEqual(10, NavCategoryStates.GetFlatIndex(ViewMode.Currency));
         }
 
         [TestMethod]

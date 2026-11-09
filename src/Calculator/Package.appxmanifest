@@ -8,11 +8,16 @@
          xmlns:iot2="http://schemas.microsoft.com/appx/manifest/iot/windows10/2"
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
          IgnorableNamespaces="uap uap3 uap5 mp desktop4 iot2 rescap">
-    <Identity Name="Microsoft.WindowsCalculator.Dev" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" Version="0.0.1.0" />
-    <mp:PhoneIdentity PhoneProductId="b58171c6-c70c-4266-a2e8-8f9c994f4456" PhonePublisherId="95d94207-0c7c-47ed-82db-d75c81153c35" />
+    <!--
+        Calcwright's own identity. Publisher must match the subject of the certificate the package is
+        signed with (see tools\make-installer.ps1). Bump Version for every release you hand out:
+        Windows only upgrades an installed copy to a higher version.
+    -->
+    <Identity Name="Calcwright" Publisher="CN=Calcwright" Version="1.0.1.0" />
+    <mp:PhoneIdentity PhoneProductId="d48a166d-c721-4b49-bae1-80d1c0a4fdbd" PhonePublisherId="bf0adce0-2814-4cb5-b32a-cac03bcd01dc" />
     <Properties>
-        <DisplayName>ms-resource:DevAppStoreName</DisplayName>
-        <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
+        <DisplayName>Calcwright</DisplayName>
+        <PublisherDisplayName>Calcwright</PublisherDisplayName>
         <Logo>Assets\CalculatorStoreLogo.png</Logo>
     </Properties>
     <Dependencies>
@@ -27,8 +32,8 @@
                      EntryPoint="Calculator.App"
                      desktop4:SupportsMultipleInstances="true"
                      iot2:SupportsMultipleInstances="true">
-            <uap:VisualElements DisplayName="ms-resource:DevAppName" Square150x150Logo="Assets\CalculatorMedTile.png" Square44x44Logo="Assets\CalculatorAppList.png" Description="ms-resource:DevAppDescription" BackgroundColor="transparent">
-                <uap:DefaultTile ShortName="ms-resource:DevAppName" Square310x310Logo="Assets\CalculatorLargeTile.png" Wide310x150Logo="Assets\CalculatorWideTile.png" Square71x71Logo="Assets\CalculatorSmallTile.png">
+            <uap:VisualElements DisplayName="Calcwright" Square150x150Logo="Assets\CalculatorMedTile.png" Square44x44Logo="Assets\CalculatorAppList.png" Description="Calcwright: calculator with torque, horsepower and electrical tools" BackgroundColor="transparent">
+                <uap:DefaultTile ShortName="Calcwright" Square310x310Logo="Assets\CalculatorLargeTile.png" Wide310x150Logo="Assets\CalculatorWideTile.png" Square71x71Logo="Assets\CalculatorSmallTile.png">
                     <uap:ShowNameOnTiles>
                         <uap:ShowOn Tile="square150x150Logo" />
                         <uap:ShowOn Tile="wide310x150Logo" />

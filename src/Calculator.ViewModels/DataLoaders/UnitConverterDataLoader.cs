@@ -205,6 +205,18 @@ namespace CalculatorApp.ViewModel.DataLoaders
         private const int Data_Nibble = 167;
         private const int Length_Angstrom = 168;
 
+        // Torque units (not in the original C++ constants; IDs start at 200 to stay clear of them)
+        private const int Torque_NewtonMeter = 200;
+        private const int Torque_KilonewtonMeter = 201;
+        private const int Torque_NewtonCentimeter = 202;
+        private const int Torque_NewtonMillimeter = 203;
+        private const int Torque_PoundForceFoot = 204;
+        private const int Torque_PoundForceInch = 205;
+        private const int Torque_OunceForceInch = 206;
+        private const int Torque_KilogramForceMeter = 207;
+        private const int Torque_KilogramForceCentimeter = 208;
+        private const int Torque_DyneCentimeter = 209;
+
         #endregion
 
         protected override void LoadData()
@@ -228,7 +240,8 @@ namespace CalculatorApp.ViewModel.DataLoaders
                 ViewMode.Volume, ViewMode.Length, ViewMode.Weight,
                 ViewMode.Temperature, ViewMode.Energy, ViewMode.Area,
                 ViewMode.Speed, ViewMode.Time, ViewMode.Power,
-                ViewMode.Data, ViewMode.Pressure, ViewMode.Angle
+                ViewMode.Data, ViewMode.Pressure, ViewMode.Angle,
+                ViewMode.Torque
             };
 
             var categoryList = new List<CategoryWrapper>();
@@ -457,6 +470,18 @@ namespace CalculatorApp.ViewModel.DataLoaders
             AddUnit(ViewMode.Angle, Angle_Radian, "UnitName_Radian", "UnitAbbreviation_Radian", 2, false, true);
             AddUnit(ViewMode.Angle, Angle_Gradian, "UnitName_Gradian", "UnitAbbreviation_Gradian", 3);
 
+            // ---- Torque ----
+            AddUnit(ViewMode.Torque, Torque_NewtonMillimeter, "UnitName_NewtonMillimeter", "UnitAbbreviation_NewtonMillimeter", 1);
+            AddUnit(ViewMode.Torque, Torque_NewtonCentimeter, "UnitName_NewtonCentimeter", "UnitAbbreviation_NewtonCentimeter", 2);
+            AddUnit(ViewMode.Torque, Torque_NewtonMeter, "UnitName_NewtonMeter", "UnitAbbreviation_NewtonMeter", 3, useUSCustomary, useSI);
+            AddUnit(ViewMode.Torque, Torque_KilonewtonMeter, "UnitName_KilonewtonMeter", "UnitAbbreviation_KilonewtonMeter", 4);
+            AddUnit(ViewMode.Torque, Torque_OunceForceInch, "UnitName_OunceForceInch", "UnitAbbreviation_OunceForceInch", 5);
+            AddUnit(ViewMode.Torque, Torque_PoundForceInch, "UnitName_PoundForceInch", "UnitAbbreviation_PoundForceInch", 6);
+            AddUnit(ViewMode.Torque, Torque_PoundForceFoot, "UnitName_PoundForceFoot", "UnitAbbreviation_PoundForceFoot", 7, useSI, useUSCustomary);
+            AddUnit(ViewMode.Torque, Torque_KilogramForceCentimeter, "UnitName_KilogramForceCentimeter", "UnitAbbreviation_KilogramForceCentimeter", 8);
+            AddUnit(ViewMode.Torque, Torque_KilogramForceMeter, "UnitName_KilogramForceMeter", "UnitAbbreviation_KilogramForceMeter", 9);
+            AddUnit(ViewMode.Torque, Torque_DyneCentimeter, "UnitName_DyneCentimeter", "UnitAbbreviation_DyneCentimeter", 10);
+
             // Sort units by order and store
             _unitsByCategory = new Dictionary<int, UnitWrapper[]>();
             foreach (var kvp in unitsByCategory)
@@ -662,6 +687,20 @@ namespace CalculatorApp.ViewModel.DataLoaders
                     { Pressure_MillimeterOfMercury, 0.0013155687145324 },
                     { Pressure_Pascal, 9.869232667160128e-6 },
                     { Pressure_PSI, 0.068045961016531 },
+                },
+                // Base unit: newton-metre. lbf = 4.4482216152605 N, kgf = 9.80665 N, ozf = lbf / 16.
+                [ViewMode.Torque] = new Dictionary<int, double>
+                {
+                    { Torque_NewtonMeter, 1 },
+                    { Torque_KilonewtonMeter, 1000 },
+                    { Torque_NewtonCentimeter, 0.01 },
+                    { Torque_NewtonMillimeter, 0.001 },
+                    { Torque_PoundForceFoot, 1.3558179483314004 },
+                    { Torque_PoundForceInch, 0.1129848290276167 },
+                    { Torque_OunceForceInch, 0.00706155181422604 },
+                    { Torque_KilogramForceMeter, 9.80665 },
+                    { Torque_KilogramForceCentimeter, 0.0980665 },
+                    { Torque_DyneCentimeter, 1e-7 },
                 },
             };
 

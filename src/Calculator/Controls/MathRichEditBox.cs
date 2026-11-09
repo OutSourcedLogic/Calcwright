@@ -87,7 +87,16 @@ namespace CalculatorApp
                                 "8wekyb3d8bbwe has registered their use of com.microsoft.windows.richeditmath with Microsoft and agrees to the terms of use.");
                 }
 
-                TextDocument.SetMathMode(RichEditMathMode.MathOnly);
+                // Calcwright's own package identity isn't one of the two names above, so the math-mode
+                // feature may not unlock. Graphing in open-source builds uses a placeholder engine anyway;
+                // don't let a refused unlock take the page down.
+                try
+                {
+                    TextDocument.SetMathMode(RichEditMathMode.MathOnly);
+                }
+                catch (Exception)
+                {
+                }
                 LosingFocus += OnLosingFocus;
                 KeyUp += OnKeyUp;
             }

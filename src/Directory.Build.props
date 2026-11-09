@@ -2,4 +2,32 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <!--
+    Build output goes to %TEMP%\Calcwright.Build\ instead of the source tree.
+    All cross-project links in this solution are ProjectReferences, so they follow these paths.
+    OutDir set here takes priority over each .csproj's own OutputPath.
+  -->
+  <PropertyGroup>
+    <CalcBuildRoot>$([MSBuild]::EnsureTrailingSlash('$(TEMP)'))Calcwright.Build\</CalcBuildRoot>
+    <CalcBuildConfigDir>$(Platform)\$(Configuration)\</CalcBuildConfigDir>
+    <CalcBuildConfigDir Condition="'$(Platform)' == '' or '$(Configuration)' == ''">Default\</CalcBuildConfigDir>
+
+    <OutDir>$(CalcBuildRoot)bin\$(CalcBuildConfigDir)$(MSBuildProjectName)\</OutDir>
+    <GenerateProjectSpecificOutputFolder>false</GenerateProjectSpecificOutputFolder>
+
+    <!-- C# (obj, including NuGet restore files) -->
+    <BaseIntermediateOutputPath>$(CalcBuildRoot)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <!-- SDK-style projects (UI tests) -->
+    <BaseOutputPath>$(CalcBuildRoot)bin\sdk\$(MSBuildProjectName)\</BaseOutputPath>
+    <!-- Old-style .csproj files set OutputPath themselves; this file overrides it afterwards. -->
+    <CustomBeforeMicrosoftCommonTargets>$(MSBuildThisFileDirectory)build\OutputRedirect.targets</CustomBeforeMicrosoftCommonTargets>
+
+    <!-- C++ intermediates -->
+    <IntDir>$(CalcBuildRoot)int\$(CalcBuildConfigDir)$(MSBuildProjectName)\</IntDir>
+    <!-- C++/WinRT generated headers (default is "<project>\Generated Files\") -->
+    <GeneratedFilesDir>$(IntDir)Generated Files\</GeneratedFilesDir>
+    <!-- MSB8029 warns about output under %TEMP%; that's deliberate here. -->
+    <IgnoreWarnIntDirInTempDetected>true</IgnoreWarnIntDirInTempDetected>
+  </PropertyGroup>
 </Project>

@@ -126,6 +126,10 @@ namespace CalculatorApp
             {
                 m_converter.SetDefaultFocus();
             }
+            if (m_engineeringCalculator != null && m_engineeringCalculator.Visibility == Visibility.Visible)
+            {
+                m_engineeringCalculator.SetDefaultFocus();
+            }
         }
 
         public void SetHeaderAutomationName()
@@ -137,6 +141,11 @@ namespace CalculatorApp
             if (NavCategory.IsDateCalculatorViewMode(mode))
             {
                 name = resProvider.GetResourceString("HeaderAutomationName_Date");
+            }
+            else if (NavCategory.IsEngineeringViewMode(mode))
+            {
+                name = LocalizationStringUtil.GetLocalizedString(
+                    resProvider.GetResourceString("HeaderAutomationName_Engineering"), ViewModel.CategoryName);
             }
             else
             {
@@ -310,6 +319,16 @@ namespace CalculatorApp
                             }
                             EnsureDateCalculator();
                         }
+                        else if (NavCategory.IsEngineeringViewMode(newValue))
+                        {
+                            if (ViewModel.CalculatorViewModel != null)
+                            {
+                                ViewModel.CalculatorViewModel.HistoryVM.AreHistoryShortcutsEnabled = false;
+                            }
+                            EnsureEngineeringCalculator();
+                            // The page is text boxes; keep calculator keyboard shortcuts from eating keystrokes.
+                            KeyboardShortcutManager.DisableShortcuts(true);
+                        }
                         else if (NavCategory.IsConverterViewMode(newValue))
                         {
                             if (ViewModel.CalculatorViewModel != null)
@@ -381,7 +400,7 @@ namespace CalculatorApp
                 return;
             }
 
-            if (ViewModel.Mode != ViewMode.Graphing)
+            if (ViewModel.Mode != ViewMode.Graphing && !NavCategory.IsEngineeringViewMode(ViewModel.Mode))
             {
                 KeyboardShortcutManager.HonorShortcuts(true);
             }
@@ -462,6 +481,13 @@ namespace CalculatorApp
             var isDateCalcViewMode = NavCategory.IsDateCalculatorViewMode(mode);
             var isGraphingCalcViewMode = NavCategory.IsGraphingCalculatorViewMode(mode);
             var isConverterViewMode = NavCategory.IsConverterViewMode(mode);
+            var isEngineeringViewMode = NavCategory.IsEngineeringViewMode(mode);
+
+            if (m_engineeringCalculator != null)
+            {
+                m_engineeringCalculator.Visibility = BooleanToVisibilityConverter.Convert(isEngineeringViewMode);
+                m_engineeringCalculator.IsEnabled = isEngineeringViewMode;
+            }
 
             if (m_calculator != null)
             {
@@ -520,7 +546,7 @@ namespace CalculatorApp
 
         private void OnPageLoaded(object sender, RoutedEventArgs args)
         {
-            if (m_converter == null && m_calculator == null && m_dateCalculator == null && m_graphingCalculator == null)
+            if (m_converter == null && m_calculator == null && m_dateCalculator == null && m_graphingCalculator == null && m_engineeringCalculator == null)
             {
                 // We have just launched into our default mode (standard calc) so ensure calc is loaded
                 EnsureCalculator();
@@ -658,6 +684,28 @@ namespace CalculatorApp
             }
         }
 
+        private void EnsureEngineeringCalculator()
+        {
+            if (m_engineeringCalculator == null)
+            {
+                m_engineeringCalculator = new EngineeringCalculator
+                {
+                    Name = "engineeringCalculator"
+                };
+                EngineeringCalcHolder.Child = m_engineeringCalculator;
+            }
+
+            // Electric power, Ohm's law and Mechanical power share this page; swap in the current mode's view model.
+            m_engineeringCalculator.ViewModel = ViewModel.EngineeringCalcViewModel;
+            m_engineeringCalculator.DataContext = ViewModel.EngineeringCalcViewModel;
+
+            if (m_calculator != null)
+            {
+                m_calculator.CloseHistoryFlyout();
+                m_calculator.CloseMemoryFlyout();
+            }
+        }
+
         private void AnnounceCategoryName()
         {
             string categoryName = AutomationProperties.GetName(Header);
@@ -702,6 +750,7 @@ namespace CalculatorApp
         private GraphingCalculator m_graphingCalculator;
         private UnitConverter m_converter;
         private DateCalculator m_dateCalculator;
+        private EngineeringCalculator m_engineeringCalculator;
         private readonly AccessibilitySettings m_accessibilitySettings;
     }
 }

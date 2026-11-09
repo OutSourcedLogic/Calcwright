@@ -175,6 +175,9 @@
     <Compile Include="Views\DateCalculator.xaml.cs">
       <DependentUpon>DateCalculator.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EngineeringCalculator.xaml.cs">
+      <DependentUpon>EngineeringCalculator.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GraphingCalculator\EquationInputArea.xaml.cs">
       <DependentUpon>EquationInputArea.xaml</DependentUpon>
     </Compile>
@@ -702,6 +705,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DateCalculator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EngineeringCalculator.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

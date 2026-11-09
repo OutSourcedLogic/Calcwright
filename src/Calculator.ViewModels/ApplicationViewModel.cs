@@ -34,6 +34,14 @@ namespace CalculatorApp.ViewModel
         [ObservableProperty]
         private UnitConverterViewModel _converterViewModel;
 
+        // The multi-field calculator for the current mode (electric power, Ohm's law, mechanical power).
+        [ObservableProperty]
+        private EngineeringCalculatorViewModel _engineeringCalcViewModel;
+
+        // One view model per engineering mode, so values survive switching modes.
+        private readonly Dictionary<ViewMode, EngineeringCalculatorViewModel> _engineeringCalcViewModels =
+            new Dictionary<ViewMode, EngineeringCalculatorViewModel>();
+
         private ViewMode _mode = ViewMode.None;
 
         [ObservableProperty]
@@ -247,6 +255,15 @@ namespace CalculatorApp.ViewModel
                     ConverterViewModel = new UnitConverterViewModel();
                 }
                 ConverterViewModel.Mode = _mode;
+            }
+            else if (NavCategory.IsEngineeringViewMode(_mode))
+            {
+                if (!_engineeringCalcViewModels.TryGetValue(_mode, out var engineeringVM))
+                {
+                    engineeringVM = EngineeringCalculatorViewModel.Create(_mode);
+                    _engineeringCalcViewModels[_mode] = engineeringVM;
+                }
+                EngineeringCalcViewModel = engineeringVM;
             }
 
             var resProvider = AppResourceProvider.GetInstance();

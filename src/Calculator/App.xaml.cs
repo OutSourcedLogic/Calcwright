@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Storage;
+using Windows.UI.Core;
 using Windows.UI.StartScreen;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -109,13 +110,21 @@ namespace CalculatorApp
             // SetPreferredMinSize should always be called before Window.Activate
             appView.SetPreferredMinSize(minWindowSize);
 
-            // For very first launch, set the size of the calc as size of the default standard mode
-            if (!localSettings.Values.ContainsKey("VeryFirstLaunch"))
+            // Until the app has once been shown and closed normally, open at the stock Windows Calculator
+            // size (AppDefaultWindowWidth/Height); after that, Windows reuses whatever size the user left it at.
+            // The flag is only recorded on a normal close (OnSuspending), so a first launch that never
+            // really showed (a background pre-launch, or the app being closed by an installer) doesn't
+            // count. Otherwise Windows falls back to its own, much larger, default size from then on.
+            var defaultWindowSize = SizeHelper.FromDimensions(
+                Math.Max(minWindowWidth, Convert.ToSingle(Resources["AppDefaultWindowWidth"])),
+                Math.Max(minWindowHeight, Convert.ToSingle(Resources["AppDefaultWindowHeight"])));
+            bool applyDefaultSize = !isPreLaunch && !localSettings.Values.ContainsKey(DefaultWindowSizeAppliedKey);
+            if (applyDefaultSize)
             {
-                localSettings.Values["VeryFirstLaunch"] = false;
-                appView.TryResizeView(minWindowSize); // the requested size must not be less than the min size.
+                appView.TryResizeView(defaultWindowSize); // the requested size must not be less than the min size.
+                m_defaultWindowSizeShown = true;
             }
-            else
+            else if (!isPreLaunch)
             {
                 ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Auto;
             }
@@ -150,12 +159,48 @@ namespace CalculatorApp
             Window.Current.Content = rootFrame;
             ThemeHelper.InitializeAppTheme();
             Window.Current.Activate();
+
+            if (applyDefaultSize)
+            {
+                // A resize requested before the window is on screen can be ignored; ask again once it is.
+                // (Windows accepts the request above but can still show the window at its own default,
+                // e.g. 1200 x 900.) How the requested height maps to the window also varies by launch: on a
+                // relaunch the title bar can be counted inside the request, leaving the window ~33 px short.
+                // So resize, measure, and correct once so the window always ends up the same size.
+                _ = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Low, async () =>
+                {
+                    var view = ApplicationView.GetForCurrentView();
+                    view.TryResizeView(defaultWindowSize);
+                    await Task.Delay(400);
+
+                    double titleBarHeight = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar.Height;
+                    if (titleBarHeight <= 0)
+                    {
+                        titleBarHeight = 32;
+                    }
+                    double wantedHeight = defaultWindowSize.Height + titleBarHeight; // window content incl. title bar area
+                    double shortBy = wantedHeight - Window.Current.Bounds.Height;
+                    if (Math.Abs(shortBy) > 1)
+                    {
+                        view.TryResizeView(new Windows.Foundation.Size(defaultWindowSize.Width, defaultWindowSize.Height + shortBy));
+                    }
+                });
+            }
         }
 
         private void OnSuspending(object sender, SuspendingEventArgs args)
         {
             TraceLogger.GetInstance().LogButtonUsage();
+
+            if (m_defaultWindowSizeShown)
+            {
+                ApplicationData.Current.LocalSettings.Values[DefaultWindowSizeAppliedKey] = true;
+            }
         }
+
+        // Replaces the upstream "VeryFirstLaunch" flag, which was set before the window had actually been shown.
+        private const string DefaultWindowSizeAppliedKey = "DefaultWindowSizeApplied";
+        private bool m_defaultWindowSizeShown;
 
         private async Task SetupJumpListAsync()
         {

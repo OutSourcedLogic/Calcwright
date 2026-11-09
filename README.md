@@ -1,76 +1,77 @@
-# Calculator
-The Windows Calculator app is a modern Windows app written in C++ and C# that ships pre-installed with Windows.
-The app provides standard, scientific, and programmer calculator functionality, as well as a set of converters between various units of measurement and currencies.
+# Calcwright
 
-Calculator ships regularly with new features and bug fixes. You can get the latest version of Calculator in the [Microsoft Store](https://www.microsoft.com/store/apps/9WZDNCRFHVN5).
+**An unofficial fork of the [Windows Calculator](https://github.com/microsoft/calculator)** with extra
+tools for mechanical and electrical work. Calcwright is not made, endorsed or supported by Microsoft.
 
-[![Continuous Integration](https://github.com/microsoft/calculator/actions/workflows/action-ci.yml/badge.svg)](https://github.com/microsoft/calculator/actions/workflows/action-ci.yml)
+It keeps everything from Windows Calculator (standard, scientific, programmer and date calculation,
+history, memory and unit converters) and adds:
 
-<img src="docs/Images/CalculatorScreenshot.png" alt="Calculator Screenshot" width="450px" />
+- **Torque converter:** newton metres, pound-force feet and inches, ounce-force inches,
+  kilogram-force metres and centimetres, and more.
+- **Mechanical power:** torque, speed and power, with horsepower and kilowatts side by side.
+- **Electric power:** voltage, current, power factor and power, single-phase/DC or three-phase,
+  with apparent (kVA) and reactive (kVAR) power.
+- **Ohm's law:** voltage, current and resistance, plus the power dissipated.
+- **Live currency rates** from [ExchangeRate-API](https://www.exchangerate-api.com), updated daily
+  (upstream developer builds use mock data).
 
-## Features
-- Standard Calculator functionality which offers basic operations and evaluates commands immediately as they are entered.
-- Scientific Calculator functionality which offers expanded operations and evaluates commands using order of operations.
-- Programmer Calculator functionality which offers common mathematical operations for developers including conversion between common bases.
-- Date Calculation functionality which offers the difference between two dates, as well as the ability to add/subtract years, months and/or days to/from a given input date.
-- Calculation history and memory capabilities.
-- Conversion between many units of measurement.
-- Currency conversion based on data retrieved from [Bing](https://www.bing.com).
-- [Infinite precision](https://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic) for basic
-  arithmetic operations (addition, subtraction, multiplication, division) so that calculations
-  never lose precision.
+In the three calculators, fill in all but one field and the last one is calculated. They are listed
+after **Date calculation** in the navigation menu.
 
-## Getting started
+## Install
+
+Download `Calcwright-<version>.exe` from the [Releases](../../releases) page and run it. See
+[installer/README.md](installer/README.md) for what to expect: the package is self-signed, so the
+first install asks to trust its certificate.
+
+Requirements: Windows 10 (19041) or newer, x64.
+
+## Build from source
+
 Prerequisites:
-- Your computer must be running Windows 11, build 22000 or newer.
-- Install the latest version of [Visual Studio](https://developer.microsoft.com/en-us/windows/downloads) (the free community edition is sufficient).
-  - Install the "Universal Windows Platform Development" workload.
-  - Install the optional "C++ Universal Windows Platform tools" component.
-  - Install the latest Windows 11 SDK.
+- Windows 11 with [Developer Mode](https://learn.microsoft.com/windows/apps/get-started/enable-your-device-for-development) turned on.
+- [Visual Studio 2026](https://visualstudio.microsoft.com/) (Community is fine) with the
+  *Universal Windows Platform development* workload, the optional *C++ Universal Windows Platform tools*
+  component, and the Windows 11 SDK (10.0.26100).
 
-  ![Visual Studio Installation Screenshot](docs/Images/VSInstallationScreenshot.png)
-- Install the [XAML Styler](https://marketplace.visualstudio.com/items?itemName=TeamXavalon.XAMLStyler) Visual Studio extension.
+Then:
 
-- Get the code:
-    ```
-    git clone https://github.com/Microsoft/calculator.git
-    ```
+```powershell
+.\Tools\build-and-run.ps1             # Debug build, installs it for the current user and starts it
+.\Tools\make-installer.ps1            # signed Release build, packed as dist\Calcwright-<version>.exe
+```
 
-- Open [src\Calculator.slnx](/src/Calculator.slnx) in Visual Studio to build and run the Calculator app.
-- For a general description of the Calculator project architecture see [ApplicationArchitecture.md](docs/ApplicationArchitecture.md).
-- To run the UI Tests, you need to make sure that
-  [Windows Application Driver (WinAppDriver)](https://github.com/microsoft/WinAppDriver/releases/latest)
-  is installed.
+Build output goes to `%TEMP%\Calcwright.Build` instead of the source tree. You can also open
+`src\Calculator.slnx` in Visual Studio. For the app's architecture, see
+[docs/ApplicationArchitecture.md](docs/ApplicationArchitecture.md).
 
-## Contributing
-Want to contribute? The team encourages community feedback and contributions. Please follow our [contributing guidelines](CONTRIBUTING.md).
+## Differences from Windows Calculator
 
-If Calculator is not working properly, please file a report in the [Feedback Hub](https://insider.windows.com/en-us/fb/?contextid=130).
-We also welcome [issues submitted on GitHub](https://github.com/Microsoft/calculator/issues).
+- **Graphing mode doesn't work.** Microsoft's graphing engine isn't open source, so builds from this
+  repository use a mock engine (the same as upstream developer builds).
+- **No diagnostic data.** Upstream sends usage data only in Microsoft's Store builds
+  (`IsStoreBuild`), which this project never uses. The only network access is the daily currency-rate
+  download.
 
-## Roadmap
-For information regarding Windows Calculator plans and release schedule, please see the [Windows Calculator Roadmap](docs/Roadmap.md).
+## Currency rates
 
-### Graphing Mode
-Adding graphing calculator functionality [is on the project roadmap](https://github.com/Microsoft/calculator/issues/338) and we hope that this project can create a great end-user experience around graphing. To that end, the UI from the official in-box Windows Calculator is currently part of this repository, although the proprietary Microsoft-built graphing engine, which also drives graphing in Microsoft Mathematics and OneNote, is not. Community members can still be involved in the creation of the UI, however developer builds will not have graphing functionality due to the use of a [mock implementation of the engine](/src/GraphingImpl/Mocks) built on top of a
-[common graphing API](/src/GraphingInterfaces).
+Rates come from ExchangeRate-API's free open endpoint (no key needed). Its terms require the
+"Rates By Exchange Rate API" credit shown under the converter and don't allow redistributing the rate
+data itself.
 
-## Diagnostic Data
-This project collects usage data and sends it to Microsoft to help improve our products and services.
-Read our [privacy statement](https://go.microsoft.com/fwlink/?LinkId=521839) to learn more.
-Diagnostic data is disabled in development builds by default, and can be enabled with the `SEND_DIAGNOSTICS`
-build flag.
+## Staying in sync with upstream
 
-## Currency Converter
-Windows Calculator includes a currency converter feature that uses mock data in developer builds. The data that
-Microsoft uses for the currency converter feature (e.g., in the retail version of the application) is not licensed
-for your use. The mock data will be clearly identifiable as it references planets instead of countries,
-and remains static regardless of selected inputs.
+Calcwright tracks `microsoft/calculator`'s `main` branch. Upstream fixes are merged in from time to time.
 
-## Reporting Security Issues
-Please refer to [SECURITY.md](./SECURITY.md).
+## Issues and security
+
+Please report bugs and security problems through this repository's
+[Issues](../../issues), not to Microsoft. See [SECURITY.md](SECURITY.md).
 
 ## License
-Copyright (c) Microsoft Corporation. All rights reserved.
 
-Licensed under the [MIT License](./LICENSE).
+Licensed under the [MIT License](LICENSE).
+
+Based on Windows Calculator, copyright (c) Microsoft Corporation, also under the MIT License.
+Third-party notices are in [NOTICE.txt](NOTICE.txt). "Windows" and "Microsoft" are trademarks of
+Microsoft Corporation, used here only to identify the original project.

@@ -34,8 +34,10 @@ namespace CalculatorApp.ViewModel.DataLoaders
         public const string CacheTimestampKey = "CURRENCY_CONVERTER_TIMESTAMP";
         public const string CacheLangcodeKey = "CURRENCY_CONVERTER_LANGCODE";
         public const string CacheDelimiter = "%";
-        public const string StaticDataFilename = "CURRENCY_CONVERTER_STATIC_DATA.txt";
-        public const string AllRatiosDataFilename = "CURRENCY_CONVERTER_ALL_RATIOS_DATA.txt";
+        // "_V2": Calcwright switched from the upstream sample data to real rates; new names make sure
+        // an old cached copy of the sample data is never read back.
+        public const string StaticDataFilename = "CURRENCY_CONVERTER_STATIC_DATA_V2.txt";
+        public const string AllRatiosDataFilename = "CURRENCY_CONVERTER_ALL_RATIOS_DATA_V2.txt";
 
         // (1 interval/100 nanosecond)(100 nanosecond/1e-7 s)(60 s/1 min)(60 min/1 hr)(24 hr/1 day)
         public const long DayDuration = 1L * 60 * 60 * 24 * 10000000;

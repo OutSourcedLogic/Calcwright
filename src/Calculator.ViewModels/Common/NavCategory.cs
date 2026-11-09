@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 // The NavCategory group of classes and enumerations is intended to serve
@@ -36,7 +36,11 @@ namespace CalculatorApp.ViewModel.Common
         Pressure = 14,
         Angle = 15,
         Currency = 16,
-        Graphing = 17
+        Graphing = 17,
+        Torque = 18,
+        MechanicalPower = 19,
+        ElectricPower = 20,
+        OhmsLaw = 21
     }
 
     public enum CategoryGroupType
@@ -114,7 +118,8 @@ namespace CalculatorApp.ViewModel.Common
         public static bool IsCalculatorViewMode(ViewMode mode)
         {
             // Historically, Calculator modes are Standard, Scientific, and Programmer.
-            return !IsDateCalculatorViewMode(mode) && !IsGraphingCalculatorViewMode(mode) && IsModeInCategoryGroup(mode, CategoryGroupType.Calculator);
+            return !IsDateCalculatorViewMode(mode) && !IsGraphingCalculatorViewMode(mode) && !IsEngineeringViewMode(mode)
+                && IsModeInCategoryGroup(mode, CategoryGroupType.Calculator);
         }
 
         public static bool IsGraphingCalculatorViewMode(ViewMode mode)
@@ -130,6 +135,15 @@ namespace CalculatorApp.ViewModel.Common
         public static bool IsConverterViewMode(ViewMode mode)
         {
             return IsModeInCategoryGroup(mode, CategoryGroupType.Converter);
+        }
+
+        /// <summary>
+        /// The multi-field calculators listed after Date calculation (electric power, Ohm's law, mechanical power).
+        /// They belong to the Calculator menu group but use their own page.
+        /// </summary>
+        public static bool IsEngineeringViewMode(ViewMode mode)
+        {
+            return mode == ViewMode.ElectricPower || mode == ViewMode.OhmsLaw || mode == ViewMode.MechanicalPower;
         }
 
         private static bool IsModeInCategoryGroup(ViewMode mode, CategoryGroupType type)
@@ -238,6 +252,10 @@ namespace CalculatorApp.ViewModel.Common
         private const int AngleId = 15;
         private const int CurrencyId = 16;
         private const int GraphingId = 17;
+        private const int TorqueId = 18;
+        private const int MechanicalPowerId = 19;
+        private const int ElectricPowerId = 20;
+        private const int OhmsLawId = 21;
         // ^^^ THESE CONSTANTS SHOULD NEVER CHANGE ^^^
 
         private static string _currentUserId;
@@ -249,6 +267,12 @@ namespace CalculatorApp.ViewModel.Common
             new NavCategoryInitializer { ViewMode = ViewMode.Graphing, SerializationId = GraphingId, FriendlyName = "Graphing", NameResourceKey = "GraphingCalculatorMode", Glyph = "\uF770", GroupType = CategoryGroupType.Calculator, VirtualKey = MyVirtualKey.Number3, AccessKey = "3", SupportsNegative = SupportsAll },
             new NavCategoryInitializer { ViewMode = ViewMode.Programmer, SerializationId = ProgrammerId, FriendlyName = "Programmer", NameResourceKey = "ProgrammerMode", Glyph = "\uECCE", GroupType = CategoryGroupType.Calculator, VirtualKey = MyVirtualKey.Number4, AccessKey = "4", SupportsNegative = SupportsAll },
             new NavCategoryInitializer { ViewMode = ViewMode.Date, SerializationId = DateId, FriendlyName = "Date", NameResourceKey = "DateCalculationMode", Glyph = "\uE787", GroupType = CategoryGroupType.Calculator, VirtualKey = MyVirtualKey.Number5, AccessKey = "5", SupportsNegative = SupportsAll },
+            // Glyphs come from the app's own Assets\CalculatorIcons.ttf (94 icons), not Segoe Fluent Icons.
+            // Multi-field calculators, listed after Date calculation without a section header of their own.
+            // Each menu group must stay contiguous here, in CreateMenuOptions order, for GetFlatIndex to work.
+            new NavCategoryInitializer { ViewMode = ViewMode.ElectricPower, SerializationId = ElectricPowerId, FriendlyName = "ElectricPower", NameResourceKey = "ElectricPowerMode", Glyph = "\uE945", GroupType = CategoryGroupType.Calculator, VirtualKey = MyVirtualKey.None, AccessKey = "6", SupportsNegative = SupportsAll },
+            new NavCategoryInitializer { ViewMode = ViewMode.OhmsLaw, SerializationId = OhmsLawId, FriendlyName = "OhmsLaw", NameResourceKey = "OhmsLawMode", Glyph = "\uF895", GroupType = CategoryGroupType.Calculator, VirtualKey = MyVirtualKey.None, AccessKey = "7", SupportsNegative = SupportsAll },
+            new NavCategoryInitializer { ViewMode = ViewMode.MechanicalPower, SerializationId = MechanicalPowerId, FriendlyName = "MechanicalPower", NameResourceKey = "MechanicalPowerMode", Glyph = "\uE713", GroupType = CategoryGroupType.Calculator, VirtualKey = MyVirtualKey.None, AccessKey = "8", SupportsNegative = SupportsAll },
             new NavCategoryInitializer { ViewMode = ViewMode.Currency, SerializationId = CurrencyId, FriendlyName = "Currency", NameResourceKey = "CategoryName_Currency", Glyph = "\uEB0D", GroupType = CategoryGroupType.Converter, VirtualKey = MyVirtualKey.None, AccessKey = null, SupportsNegative = PositiveOnly },
             new NavCategoryInitializer { ViewMode = ViewMode.Volume, SerializationId = VolumeId, FriendlyName = "Volume", NameResourceKey = "CategoryName_Volume", Glyph = "\uF1AA", GroupType = CategoryGroupType.Converter, VirtualKey = MyVirtualKey.None, AccessKey = null, SupportsNegative = PositiveOnly },
             new NavCategoryInitializer { ViewMode = ViewMode.Length, SerializationId = LengthId, FriendlyName = "Length", NameResourceKey = "CategoryName_Length", Glyph = "\uECC6", GroupType = CategoryGroupType.Converter, VirtualKey = MyVirtualKey.None, AccessKey = null, SupportsNegative = PositiveOnly },
@@ -262,6 +286,9 @@ namespace CalculatorApp.ViewModel.Common
             new NavCategoryInitializer { ViewMode = ViewMode.Data, SerializationId = DataId, FriendlyName = "Data", NameResourceKey = "CategoryName_Data", Glyph = "\uF20F", GroupType = CategoryGroupType.Converter, VirtualKey = MyVirtualKey.None, AccessKey = null, SupportsNegative = PositiveOnly },
             new NavCategoryInitializer { ViewMode = ViewMode.Pressure, SerializationId = PressureId, FriendlyName = "Pressure", NameResourceKey = "CategoryName_Pressure", Glyph = "\uEC4A", GroupType = CategoryGroupType.Converter, VirtualKey = MyVirtualKey.None, AccessKey = null, SupportsNegative = PositiveOnly },
             new NavCategoryInitializer { ViewMode = ViewMode.Angle, SerializationId = AngleId, FriendlyName = "Angle", NameResourceKey = "CategoryName_Angle", Glyph = "\uF515", GroupType = CategoryGroupType.Converter, VirtualKey = MyVirtualKey.None, AccessKey = null, SupportsNegative = SupportsNegative },
+            // Torque must stay directly after Angle: its position in the Converter group has to match
+            // the category order built in UnitConverterDataLoader.LoadData.
+            new NavCategoryInitializer { ViewMode = ViewMode.Torque, SerializationId = TorqueId, FriendlyName = "Torque", NameResourceKey = "CategoryName_Torque", Glyph = "\uE72C", GroupType = CategoryGroupType.Converter, VirtualKey = MyVirtualKey.None, AccessKey = "TQ", SupportsNegative = PositiveOnly },
         };
 
         public static void SetCurrentUser(string userId)

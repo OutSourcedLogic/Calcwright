@@ -397,12 +397,15 @@ namespace CalculatorApp.ViewModel
                             NavCategoryStates.Serialize(ViewMode.Currency);
                     }
                     OnPropertyChanged(nameof(CurrentCategory));
+                    OnPropertyChanged(nameof(SupplementaryVisibility));
                 }
             }
         }
 
+        // Calcwright: no "About equal to" row on Currency (the inbox Calculator doesn't show one there).
         public Windows.UI.Xaml.Visibility SupplementaryVisibility =>
-            SupplementaryResults?.Count > 0 ? Windows.UI.Xaml.Visibility.Visible : Windows.UI.Xaml.Visibility.Collapsed;
+            SupplementaryResults?.Count > 0 && !IsCurrencyCurrentCategory
+                ? Windows.UI.Xaml.Visibility.Visible : Windows.UI.Xaml.Visibility.Collapsed;
 
         public Windows.UI.Xaml.Visibility CurrencySymbolVisibility =>
             string.IsNullOrEmpty(CurrencySymbol1) || string.IsNullOrEmpty(CurrencySymbol2)

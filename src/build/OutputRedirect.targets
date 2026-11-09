@@ -1,0 +1,11 @@
+<Project>
+  <!--
+    Imported via CustomBeforeMicrosoftCommonTargets (set in Directory.Build.props), i.e. after each
+    project's own PropertyGroups but before MSBuild derives paths from OutputPath. The UWP projects
+    hard-code OutputPath (for example ..\x64\Debug\Calculator\), and the XAML compiler and app
+    packaging write there, so point it at the same %TEMP% folder as OutDir.
+  -->
+  <PropertyGroup Condition="'$(CalcBuildRoot)' != '' and '$(MSBuildProjectExtension)' == '.csproj'">
+    <OutputPath>$(OutDir)</OutputPath>
+  </PropertyGroup>
+</Project>

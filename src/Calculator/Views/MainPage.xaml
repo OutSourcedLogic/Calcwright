@@ -145,6 +145,9 @@
                     <Border x:Name="ConverterHolder">
                         <!-- PLACEHOLDER!!!! This is where the converter goes when it is delay loaded -->
                     </Border>
+                    <Border x:Name="EngineeringCalcHolder">
+                        <!-- Multi-field calculators (electric power, Ohm's law, mechanical power), delay loaded -->
+                    </Border>
                 </Grid>
 
                 <Grid Height="{StaticResource HamburgerHeight}"

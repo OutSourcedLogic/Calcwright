@@ -655,6 +655,14 @@
                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
                            Text="{x:Bind ViewModel.CurrencyTimestamp, Mode=OneWay}"/>
 
+                <!-- Attribution required by the free ExchangeRate-API open endpoint (see CurrencyHttpClient.cs) -->
+                <TextBlock x:Name="CurrencyAttributionTextBlock"
+                           Margin="16,2,0,0"
+                           Style="{ThemeResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
+                    <Hyperlink NavigateUri="https://www.exchangerate-api.com" UnderlineStyle="None">Rates By Exchange Rate API</Hyperlink>
+                </TextBlock>
+
                 <!-- Currency Refresh button and additional status text -->
                 <ContentControl x:Name="CurrencyRefreshBlockControl"
                                 IsTabStop="False"
