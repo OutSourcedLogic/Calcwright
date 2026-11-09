@@ -8,21 +8,37 @@ history, memory and unit converters) and adds:
 
 - **Torque converter:** newton metres, pound-force feet and inches, ounce-force inches,
   kilogram-force metres and centimetres, and more.
-- **Mechanical power:** torque, speed and power, with horsepower and kilowatts side by side.
 - **Electric power:** voltage, current, power factor and power, single-phase/DC or three-phase,
   with apparent (kVA) and reactive (kVAR) power.
 - **Ohm's law:** voltage, current and resistance, plus the power dissipated.
+- **Mechanical power:** torque, speed and power, with horsepower and kilowatts side by side.
 - **Live currency rates** from [ExchangeRate-API](https://www.exchangerate-api.com), updated daily
   (upstream developer builds use mock data).
 
 In the three calculators, fill in all but one field and the last one is calculated. They are listed
-after **Date calculation** in the navigation menu.
+right after **Date calculation** in the navigation menu; Torque is at the end of the converters.
 
-## Install
+## Screenshots
 
-Download `Calcwright-<version>.exe` from the [Releases](../../releases) page and run it. See
-[installer/README.md](installer/README.md) for what to expect: the package is self-signed, so the
-first install asks to trust its certificate.
+| Electric power | Ohm's law | Mechanical power |
+|:---:|:---:|:---:|
+| <img src="docs/Images/calcwright-electric-power.png" alt="Electric power calculator, three-phase: 480 V, 40 A, power factor 0.85 gives 28.27 kW" width="260"> | <img src="docs/Images/calcwright-ohms-law.png" alt="Ohm's law calculator: 24 V and 0.5 A give 48 ohms, 12 W dissipated" width="260"> | <img src="docs/Images/calcwright-mechanical-power.png" alt="Mechanical power calculator: 350 lb-ft at 4200 RPM gives 279.9 hp" width="260"> |
+
+| Torque converter | Navigation menu |
+|:---:|:---:|
+| <img src="docs/Images/calcwright-torque.png" alt="Torque converter: 340 newton-meters is 250.77 pound-force feet" width="260"> | <img src="docs/Images/calcwright-menu.png" alt="Navigation menu with Electric power, Ohm's law and Mechanical power after Date calculation" width="260"> |
+
+## Getting Calcwright
+
+**There's no public installer yet.** Calcwright is a packaged (MSIX) Windows app, and Windows only
+installs those when they're signed by a publisher it trusts. A self-signed installer would ask every
+user to trust the builder's own certificate, which isn't a fair thing to ask of strangers, so for now
+Calcwright is available as source code.
+
+- **Developers:** build it yourself with the steps below. Your build is signed with a certificate made
+  on your own PC.
+- **Everyone else:** if you'd like a ready-made installer, [open an issue](../../issues) to say so.
+  Enough interest will decide whether Calcwright gets a properly signed release.
 
 Requirements: Windows 10 (19041) or newer, x64.
 
@@ -40,6 +56,9 @@ Then:
 .\Tools\build-and-run.ps1             # Debug build, installs it for the current user and starts it
 .\Tools\make-installer.ps1            # signed Release build, packed as dist\Calcwright-<version>.exe
 ```
+
+`build-and-run.ps1` replaces any Calcwright already installed. To share your build with people who
+trust you, see [installer/README.md](installer/README.md).
 
 Build output goes to `%TEMP%\Calcwright.Build` instead of the source tree. You can also open
 `src\Calculator.slnx` in Visual Studio. For the app's architecture, see
