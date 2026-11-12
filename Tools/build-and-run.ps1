@@ -4,10 +4,19 @@
 # To build an installer to share, use Tools\make-installer.ps1 instead.
 param(
     [ValidateSet('Debug', 'Release')] [string]$Configuration = 'Debug',
-    [switch]$NoLaunch
+    [switch]$NoLaunch,
+    # Allow replacing a real (signed, installer-installed) Calcwright with this dev build.
+    [switch]$ReplaceInstalled
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+# Dev registrations and the real signed install share the name "Calcwright". Never remove a real one by accident.
+$existing = Get-AppxPackage Calcwright
+if ($existing -and -not $existing.IsDevelopmentMode -and -not $ReplaceInstalled) {
+    throw "Calcwright $($existing.Version) is installed from the installer (not a dev build). " +
+          "Run again with -ReplaceInstalled to replace it with this dev build."
+}
 
 $src = Join-Path $PSScriptRoot '..\src' | Resolve-Path
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
@@ -25,7 +34,7 @@ $appPackages = Join-Path $buildRoot "bin\x64\$Configuration\Calculator\Calculato
 $bundle = Get-ChildItem $appPackages -Recurse -Filter '*.msixbundle' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 $layout = Join-Path $buildRoot "layout\x64-$Configuration"
 
-# Remove any installed copy (including one from the installer, or the pre-rename dev identity).
+# Remove the installed copy (checked above: a dev build, or -ReplaceInstalled), and the pre-rename dev identity.
 Get-AppxPackage Calcwright | Remove-AppxPackage
 Get-AppxPackage Microsoft.WindowsCalculator.Dev | Remove-AppxPackage
 if (Test-Path $layout) { Remove-Item $layout -Recurse -Force }

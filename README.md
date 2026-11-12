@@ -16,7 +16,11 @@ history, memory and unit converters) and adds:
   (upstream developer builds use mock data).
 
 In the three calculators, fill in all but one field and the last one is calculated. They are listed
-right after **Date calculation** in the navigation menu; Torque is at the end of the converters.
+right after **Date calculation** in the navigation menu, and **Alt+6**, **Alt+7** and **Alt+8** open them,
+continuing the stock Alt+1 to Alt+5. Torque is at the end of the converters.
+
+Mode shortcuts also react on key-down, so pressing Alt first and letting go of it slightly before the
+digit still switches modes (the stock app ignores that).
 
 ## Screenshots
 

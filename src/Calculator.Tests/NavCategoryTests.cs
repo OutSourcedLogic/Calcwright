@@ -396,6 +396,9 @@ namespace Calculator.Tests
             Assert.AreEqual(ViewMode.Graphing, NavCategoryStates.GetViewModeForVirtualKey(MyVirtualKey.Number3));
             Assert.AreEqual(ViewMode.Programmer, NavCategoryStates.GetViewModeForVirtualKey(MyVirtualKey.Number4));
             Assert.AreEqual(ViewMode.Date, NavCategoryStates.GetViewModeForVirtualKey(MyVirtualKey.Number5));
+            Assert.AreEqual(ViewMode.ElectricPower, NavCategoryStates.GetViewModeForVirtualKey(MyVirtualKey.Number6));
+            Assert.AreEqual(ViewMode.OhmsLaw, NavCategoryStates.GetViewModeForVirtualKey(MyVirtualKey.Number7));
+            Assert.AreEqual(ViewMode.MechanicalPower, NavCategoryStates.GetViewModeForVirtualKey(MyVirtualKey.Number8));
         }
 
         [TestMethod]

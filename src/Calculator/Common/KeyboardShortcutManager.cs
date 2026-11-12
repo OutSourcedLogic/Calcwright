@@ -720,7 +720,10 @@ namespace CalculatorApp
             
             private static void OnAcceleratorKeyActivated(CoreDispatcher dispatcher, AcceleratorKeyEventArgs args)
             {
-                if (args.KeyStatus.IsKeyReleased)
+                // Calcwright: switch modes when the key goes *down* with Alt held. Upstream waited for the key's
+                // release and then required Alt to still be held, so a quick tap where Alt came up a moment
+                // before the digit was silently ignored (Alt+1..8 felt "sticky"). WasKeyDown skips auto-repeat.
+                if (args.EventType == CoreAcceleratorKeyEventType.SystemKeyDown && !args.KeyStatus.WasKeyDown)
                 {
                     var key = args.VirtualKey;
                     bool altPressed = args.KeyStatus.IsMenuKeyDown;
