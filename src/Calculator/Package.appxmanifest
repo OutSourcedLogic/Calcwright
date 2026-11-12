@@ -13,7 +13,7 @@
         signed with (see tools\make-installer.ps1). Bump Version for every release you hand out:
         Windows only upgrades an installed copy to a higher version.
     -->
-    <Identity Name="Calcwright" Publisher="CN=Calcwright" Version="1.0.1.0" />
+    <Identity Name="Calcwright" Publisher="CN=Calcwright" Version="1.1.0.0" />
     <mp:PhoneIdentity PhoneProductId="d48a166d-c721-4b49-bae1-80d1c0a4fdbd" PhonePublisherId="bf0adce0-2814-4cb5-b32a-cac03bcd01dc" />
     <Properties>
         <DisplayName>Calcwright</DisplayName>
